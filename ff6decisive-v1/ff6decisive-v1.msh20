@@ -1,0 +1,118 @@
+#>load orig.mid
+
+label_tracks
+allzero del_stuff
+
+define strings string_ensemble_1
+
+# define organ drawbar_organ
+define organ percussive_organ
+# define organ rock_organ
+
+define guitar overdrive
+define bass fretless
+
+# 57
+define crash crash_cymbal_1
+# 69...
+define hihat pedal_hi
+define cymbal2 open_hi-hat
+define bdrum bass_drum_1
+define snare acoustic_snare
+
+define reed tango
+
+remap_instr \
+	32 $strings \
+	33 $organ \
+	34 $guitar \
+	35 $bass \
+	36 1036 \
+	37 1037 \
+	38 1038 \
+	39 1039 \
+	40 1040 \
+
+split_all
+channel_all
+
+# Fix percussion
+empty {
+	filter_instr 1036 {
+		remap 0,127 $crash
+		volume_mod 0.8
+	or }
+	filter_instr 1037 {
+		remap 0,127 $hihat
+		volume_mod 1.2
+	or }
+	filter_instr 1038 {
+		remap 0,127 $cymbal2
+	or }
+	filter_instr 1039 {
+		remap 0,127 $bdrum
+		volume_mod 1.1
+	or }
+	filter_instr 1040 {
+		remap 0,127 $snare
+		volume_mod 0.9
+	or }
+
+	channel 9.5
+	instr 1000
+	vol_combine 127
+	pan 64
+	# foreach exec print(self.tracks[self.peek()][:10])
+	auto_merge
+}
+
+del_empty
+
+# ****
+
+filter_instr $guitar auto_merge
+filter_instr $organ auto_merge
+filter_instr $strings auto_merge
+del_empty
+
+# Fix instruments
+
+filter_instr $strings {
+	volume_mod 1.3
+	vol_combine
+}
+
+filter_instr $organ {
+	volume_mod 1.41
+	# volume_mod 1.1
+
+	# { clone_append $reed
+	#	instr $reed
+	#	transpose -12
+	#	volume_mod 2/3
+	#	# volume_mod 5/7
+	# }
+}
+
+filter_instr $guitar {
+	transpose -24
+	volume_mod 0.9
+
+	# { clone_append High
+	#	transpose 24
+	#	zip 2 merge_lazy
+	# }
+}
+
+filter_instr $bass {
+	transpose -24
+	volume_mod 1.75
+}
+
+# Fix percussion instrument number
+filter_instr 1000 instr 0
+
+list
+channel_all
+
+write

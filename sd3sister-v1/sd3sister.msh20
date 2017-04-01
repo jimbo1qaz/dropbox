@@ -1,0 +1,118 @@
+#>load orig.mid
+
+# bug: chorium plus tamb too loud
+
+# fix_zero
+
+allzero del_stuff
+track 1 instr 127
+
+label_tracks
+
+
+# list_instr
+
+# 22 Harmonica
+# 23 Tango Accordion
+# 25 Acoustic Guitar(steel)
+# 31 Guitar Harmonics
+# 32 Acoustic Bass
+# 43 Contrabass
+# 127 Gunshot
+
+define _vibehi 	22
+define _flute  	23
+define _vibelo 	25
+define _bass   	31
+define _tamb   	32
+define _strings	43
+define _drums  	127
+
+define vibes  	vibraphone
+define flute  	flute
+define flute2 	ocarina
+define bass   	(pick)
+define strings	string_ensemble_1
+
+
+define _tambi 	69
+define _bdrumi	62
+define _snarei	69
+
+define tamb 	tambourine
+define bdrum	bass_drum_1
+define snare	acoustic_snare
+
+
+split_all
+
+none {
+	# TODO: fancy vibes are too quiet
+
+	filter_instr $_vibehi {
+		transpose 24
+		volume_mod 0.7
+		instr $vibes
+	or }
+
+	filter_instr $_vibelo {
+		instr $vibes
+	or }
+
+	auto_merge
+}
+
+filter_instr $_flute {
+	transpose 12
+	volume_mod 0.7
+	instr $flute
+
+	# volume_mod 70/75
+	# clone_append $flute2 {
+	#	instr $flute2
+	#	volume_mod 0.77		# sqrt 3/5
+	#	auto_merge
+	# }
+	# volume_mod 0.89			# sqrt 4/5
+
+	auto_merge
+}
+
+filter_instr $_bass {
+	transpose -36
+	volume_mod 0.9
+	instr $bass
+	auto_merge
+}
+
+filter_instr $_strings {
+	transpose 12
+	volume_mod 0.95
+	instr $strings
+	auto_merge
+}
+
+none {
+	filter_instr $_tamb {
+		remap $_tambi $tamb
+		volume_mod 0.6
+	or }
+
+	filter_instr $_drums {
+		remap \
+			$_bdrumi $bdrum \
+			$_snarei $snare
+	or }
+
+	instr 0
+	channel 9.5
+	vol_combine 96
+	merge
+}
+
+del_empty
+
+channel_all
+list
+
+write
